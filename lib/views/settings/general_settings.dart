@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:businet_medical_center/models/system_config.dart';
 import 'package:businet_medical_center/utils/check_funcs.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+// import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:overlay_support/overlay_support.dart';
 import '/views/settings/database_settings.dart';
 
@@ -259,7 +259,7 @@ class _GeneralSettingsState extends State<GeneralSettings> {
             // height: 80,
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
             child: ListTile(
-              onTap: onTapInvoicesSavingFolder,
+              // onTap: onTapInvoicesSavingFolder,
               leading: const Icon(Icons.folder),
               title: const Text('Invoices Saving Folder'),
               subtitle:
@@ -271,50 +271,50 @@ class _GeneralSettingsState extends State<GeneralSettings> {
     );
   }
 
-  void onTapInvoicesSavingFolder() {
-    showMaterialModalBottomSheet(
-      backgroundColor: Colors.transparent,
-      // shape: RoundedRectangleBorder(
-      //   borderRadius: BorderRadius.circular(10),
-      // ),
-      context: context,
-      builder: (context) {
-        TextEditingController cont = TextEditingController(
-          text: SystemConfig().invoicesSaveDirectoryPath,
-        );
-        return Container(
-          height: 200,
-          margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            // color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Column(
-            children: [
-              TextField(
-                controller: cont,
-                onSubmitted: (String input) async {
-                  if (await chkdir(input)) {
-                    SystemConfig().invoicesSaveDirectoryPath = input;
-                    Navigator.pop(context);
-                    setState(() {});
-                  } else {
-                    toast("We can't find the specified directory");
-                  }
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+  // void onTapInvoicesSavingFolder() {
+  //   showMaterialModalBottomSheet(
+  //     backgroundColor: Colors.transparent,
+  //     // shape: RoundedRectangleBorder(
+  //     //   borderRadius: BorderRadius.circular(10),
+  //     // ),
+  //     context: context,
+  //     builder: (context) {
+  //       TextEditingController cont = TextEditingController(
+  //         text: SystemConfig().invoicesSaveDirectoryPath,
+  //       );
+  //       return Container(
+  //         height: 200,
+  //         margin: const EdgeInsets.all(16),
+  //         padding: const EdgeInsets.all(16),
+  //         decoration: BoxDecoration(
+  //           // color: Colors.white,
+  //           borderRadius: BorderRadius.circular(15),
+  //         ),
+  //         child: Column(
+  //           children: [
+  //             TextField(
+  //               controller: cont,
+  //               onSubmitted: (String input) async {
+  //                 if (await chkdir(input)) {
+  //                   SystemConfig().invoicesSaveDirectoryPath = input;
+  //                   Navigator.pop(context);
+  //                   setState(() {});
+  //                 } else {
+  //                   toast("We can't find the specified directory");
+  //                 }
+  //               },
+  //               decoration: InputDecoration(
+  //                 border: OutlineInputBorder(
+  //                   borderRadius: BorderRadius.circular(8),
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 }
 
 class GeneralSettingsAppBar extends StatelessWidget {
