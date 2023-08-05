@@ -1,0 +1,428 @@
+import 'package:businet_medical_center/models/patient_model.dart';
+import 'package:businet_medical_center/views/widgets/datetime_picker.dart';
+import 'package:businet_medical_center/views/widgets/focusable_field.dart';
+import 'package:flutter/material.dart';
+
+class ReservationViews extends StatefulWidget {
+  const ReservationViews({Key? key}) : super(key: key);
+
+  @override
+  State<ReservationViews> createState() => _ReservationViewsState();
+}
+
+class _ReservationViewsState extends State<ReservationViews> {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController ageController = TextEditingController();
+  TextEditingController phoneNumberController = TextEditingController();
+  TextEditingController dateTimeController =
+      TextEditingController(text: DateTime.now().toString());
+  TextEditingController noteController = TextEditingController();
+  TextEditingController totalController = TextEditingController();
+  TextEditingController serviceDescriptionController = TextEditingController();
+  FocusNode nameNode = FocusNode();
+  FocusNode ageNode = FocusNode();
+  FocusNode phoneNumberNode = FocusNode();
+  FocusNode dateTimeNode = FocusNode();
+  FocusNode noteNode = FocusNode();
+  FocusNode totalNode = FocusNode();
+  FocusNode serviceDescriptionNode = FocusNode();
+
+  Gender selectedGenderType = Gender.male;
+  AgeUnitType selectedAgeUnitType = AgeUnitType.year;
+
+  Widget patientsTable(dayPatients) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height - 350,
+      child: Column(
+        children: [
+          Expanded(
+            child: Table(
+              border: TableBorder.all(),
+              children: [
+                const TableRow(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(4.0),
+                      child: Text('الرقم'),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(4.0),
+                      child: Text('الاسم'),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(4.0),
+                      child: Text('الخدمة'),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(4.0),
+                      child: Text('الاجمالي'),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(4.0),
+                      child: Text('المدفوع'),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(4.0),
+                      child: Text('المتبقي'),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(4.0),
+                      child: Text('الكشف'),
+                    ),
+                  ],
+                ),
+                ...dayPatients.map((e) {
+                  return TableRow(
+                    children: [
+                      Text(e.id.toString()),
+                      Text(e.patientName.toString()),
+                      Text(e.serviceModel.description.toString()),
+                      Text(e.total.toString()),
+                      Text(e.payed.toString()),
+                      Text(e.wanted.toString()),
+                      Text(e.hasBeenChecked.toString()),
+                    ],
+                  );
+                }).toList(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ادارة الحجوزات'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: FutureBuilder<List<PatientModel>>(
+          future: PatientModel.getAll(),
+          builder: (context, snap) {
+            if (snap.hasError) {
+              return Center(
+                child: Text('حدث خطأ ما:  ${snap.error}'),
+              );
+            }
+            if (snap.hasData) {
+              List<PatientModel> dayPatients = snap.data!;
+              return Column(
+                children: [
+                  patientsTable(dayPatients),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'بيانات المريض',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                ),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: FocusableField(
+                                        nameController,
+                                        nameNode,
+                                        'الاسم',
+                                        (text) {
+                                          return true;
+                                        },
+                                        null,
+                                        null,
+                                        'عذرا خانة الاسم فارغة',
+                                        false,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: FocusableField(
+                                        phoneNumberController,
+                                        phoneNumberNode,
+                                        'الهاتف',
+                                        (text) {
+                                          return true;
+                                        },
+                                        null,
+                                        null,
+                                        'عذرا خانة الخدمة فارغة',
+                                        false,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 200,
+                                      child: FocusableField(
+                                        ageController,
+                                        ageNode,
+                                        'السن',
+                                        (text) {
+                                          return true;
+                                        },
+                                        null,
+                                        null,
+                                        'عذرا خانة السن فارغة',
+                                        true,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 100,
+                                      child: DropdownButton<AgeUnitType>(
+                                        items: [
+                                          ...AgeUnitType.values.map((e) {
+                                            var tr = e == AgeUnitType.day
+                                                ? 'يوم'
+                                                : e == AgeUnitType.year
+                                                    ? 'سنة'
+                                                    : 'شهر';
+                                            return DropdownMenuItem<
+                                                AgeUnitType>(
+                                              value: e,
+                                              child: Text(
+                                                tr,
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ],
+                                        value: selectedAgeUnitType,
+                                        onChanged: (value) {
+                                          if (value != null) {
+                                            setState(() {});
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    const Text('الجنس : '),
+                                    const SizedBox(width: 8),
+                                    SizedBox(
+                                      width: 100,
+                                      child: DropdownButton<Gender>(
+                                        items: [
+                                          ...Gender.values.map((e) {
+                                            var tr = e == Gender.male
+                                                ? 'ذكر'
+                                                : 'انثى';
+                                            return DropdownMenuItem<Gender>(
+                                              value: e,
+                                              child: Text(
+                                                tr,
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ],
+                                        value: selectedGenderType,
+                                        onChanged: (value) {
+                                          if (value != null) {
+                                            setState(() {});
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    const Text('تاريخ الحجز : '),
+                                    const SizedBox(width: 8),
+                                    SizedBox(
+                                      width: 200,
+                                      height: 50,
+                                      child: DateTimePicker(
+                                        controller: dateTimeController,
+                                        // initialValue: DateTime.now().toString(),
+                                        initialDate: DateTime.now(),
+                                        firstDate: DateTime(2010),
+                                        lastDate: DateTime(2100),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: FocusableField(
+                                            serviceDescriptionController,
+                                            serviceDescriptionNode,
+                                            'الخدمة',
+                                            (text) {
+                                              return true;
+                                            },
+                                            null,
+                                            null,
+                                            'عذرا خانة الخدمة فارغة',
+                                            false,
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.more_horiz),
+                                          onPressed: () {},
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 150,
+                                    child: FocusableField(
+                                      totalController,
+                                      totalNode,
+                                      'الاجمالي',
+                                      (text) {
+                                        return true;
+                                      },
+                                      null,
+                                      null,
+                                      'عذرا خانة الخدمة فارغة',
+                                      false,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: FocusableField(
+                                      noteController,
+                                      noteNode,
+                                      'ملاحظات',
+                                      (text) {
+                                        return true;
+                                      },
+                                      null,
+                                      null,
+                                      null,
+                                      false,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.more_horiz),
+                                    onPressed: () {},
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              '213',
+                              style: TextStyle(
+                                fontSize: 72,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            if (snap.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              return const Center(
+                child: Text('لا يوجد شيء لعرضه'),
+              );
+            }
+          },
+        ),
+      ),
+    );
+  }
+}
+
+
+   // child: Table(
+            //   border: TableBorder.all(
+            //     color: Colors.white30,
+            //   ),
+            //   children: [
+            //     const TableRow(
+            //       children: [
+            //         Padding(
+            //           padding: EdgeInsets.all(4.0),
+            //           child: Text('الرقم'),
+            //         ),
+            //         Padding(
+            //           padding: EdgeInsets.all(4.0),
+            //           child: Text('الاسم'),
+            //         ),
+            //         Padding(
+            //           padding: EdgeInsets.all(4.0),
+            //           child: Text('الخدمة'),
+            //         ),
+            //         Padding(
+            //           padding: EdgeInsets.all(4.0),
+            //           child: Text('الاجمالي'),
+            //         ),
+            //         Padding(
+            //           padding: EdgeInsets.all(4.0),
+            //           child: Text('المدفوع'),
+            //         ),
+            //         Padding(
+            //           padding: EdgeInsets.all(4.0),
+            //           child: Text('المتبقي'),
+            //         ),
+            //         Padding(
+            //           padding: EdgeInsets.all(4.0),
+            //           child: Text('الكشف'),
+            //         ),
+            //       ],
+            //     ),
+            //     ...dayPatients.map((e) {
+            //       return TableRow(
+            //         children: [
+            //           Padding(
+            //             padding: const EdgeInsets.all(4.0),
+            //             child: Text(e.id.toString()),
+            //           ),
+            //           Padding(
+            //             padding: const EdgeInsets.all(4.0),
+            //             child: Text(e.patientName.toString()),
+            //           ),
+            //           Padding(
+            //             padding: const EdgeInsets.all(4.0),
+            //             child: Text(e.serviceType.description.toString()),
+            //           ),
+            //           Padding(
+            //             padding: const EdgeInsets.all(4.0),
+            //             child: Text(e.total.toString()),
+            //           ),
+            //           Padding(
+            //             padding: const EdgeInsets.all(4.0),
+            //             child: Text(e.payed.toString()),
+            //           ),
+            //           Padding(
+            //             padding: const EdgeInsets.all(4.0),
+            //             child: Text(e.wanted.toString()),
+            //           ),
+            //           Padding(
+            //             padding: const EdgeInsets.all(4.0),
+            //             child: Text(e.hasBeenChecked.toString()),
+            //           ),
+            //         ],
+            //       );
+            //     }).toList(),
+            //   ],
+            // ),
